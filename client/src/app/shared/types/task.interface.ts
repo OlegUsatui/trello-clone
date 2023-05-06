@@ -1,8 +1,8 @@
 export interface TaskInterface {
-  id: string;
+  id: string
   title: string;
   description?: string;
-  columnId: string;
   boardId: string;
   userId: string;
+  columnId: string;
 }

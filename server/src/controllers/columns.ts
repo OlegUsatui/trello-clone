@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import { Socket } from "../types/socket.interface";
 import { SocketEventsEnum } from "../types/socketEvents.enum";
 import { getErrorMessage } from "../helpers";
+import BoardModel from '../models/board';
 
 export const getColumns = async (
   req: ExpressRequestInterface,
@@ -30,7 +31,7 @@ export const createColumn = async (
   try {
     if (!socket.user) {
       socket.emit(
-        SocketEventsEnum.columnsCreateFailure,
+        SocketEventsEnum.columnCreateFailure,
         "User is not authorized"
       );
       return;
@@ -42,61 +43,45 @@ export const createColumn = async (
     });
     const savedColumn = await newColumn.save();
     io.to(data.boardId).emit(
-      SocketEventsEnum.columnsCreateSuccess,
+      SocketEventsEnum.columnCreateSuccess,
       savedColumn
     );
     console.log("savedColumn", savedColumn);
   } catch (err) {
-    socket.emit(SocketEventsEnum.columnsCreateFailure, getErrorMessage(err));
+    socket.emit(SocketEventsEnum.columnCreateFailure, getErrorMessage(err));
   }
 };
 
 export const deleteColumn = async (
   io: Server,
   socket: Socket,
-  data: { boardId: string; columnId: string }
-) => {
+  data: { boardId: string, columnId: string }
+) =>  {
   try {
-    if (!socket.user) {
-      socket.emit(
-        SocketEventsEnum.columnsDeleteFailure,
-        "User is not authorized"
-      );
+    if(!socket.user) {
+      socket.emit(SocketEventsEnum.columnDeleteFailure, 'User is not authorized');
       return;
     }
-    await ColumnModel.deleteOne({ _id: data.columnId });
-    io.to(data.boardId).emit(
-      SocketEventsEnum.columnsDeleteSuccess,
-      data.columnId
-    );
+    await ColumnModel.findByIdAndDelete({ _id: data.columnId });
+    io.to(data.boardId).emit(SocketEventsEnum.columnDeleteSuccess, data.columnId);
   } catch (err) {
-    socket.emit(SocketEventsEnum.columnsDeleteFailure, getErrorMessage(err));
+    socket.emit(SocketEventsEnum.columnDeleteFailure, getErrorMessage(err))
   }
 };
 
 export const updateColumn = async (
   io: Server,
   socket: Socket,
-  data: { boardId: string; columnId: string; fields: { title: string } }
-) => {
+  data: { boardId: string, columnId: string, fields: {title: string} }
+) =>  {
   try {
-    if (!socket.user) {
-      socket.emit(
-        SocketEventsEnum.columnsUpdateFailure,
-        "User is not authorized"
-      );
-      return;
+    if(!socket.user) {
+      socket.emit(SocketEventsEnum.columnUpdateFailure, 'User is not authorized')
+      return
     }
-    const updatedColumn = await ColumnModel.findByIdAndUpdate(
-      data.columnId,
-      data.fields,
-      { new: true }
-    );
-    io.to(data.boardId).emit(
-      SocketEventsEnum.columnsUpdateSuccess,
-      updatedColumn
-    );
+    const newColumn = await ColumnModel.findByIdAndUpdate(data.columnId, data.fields, { new: true })
+    io.to(data.boardId).emit(SocketEventsEnum.columnUpdateSuccess, newColumn)
   } catch (err) {
-    socket.emit(SocketEventsEnum.columnsUpdateFailure, getErrorMessage(err));
+    socket.emit(SocketEventsEnum.columnUpdateFailure, getErrorMessage(err))
   }
 };

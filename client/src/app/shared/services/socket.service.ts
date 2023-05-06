@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CurrentUserInterface } from 'src/app/auth/types/currentUser.interface';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { Observable } from 'rxjs';
+import {Observable} from "rxjs";
 
 @Injectable()
 export class SocketService {
@@ -38,8 +38,8 @@ export class SocketService {
 
     return new Observable((subscriber) => {
       socket.on(eventName, (data) => {
-        subscriber.next(data);
-      });
-    });
+        subscriber.next(data)
+      })
+    })
   }
 }

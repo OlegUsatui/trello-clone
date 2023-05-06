@@ -6,8 +6,7 @@
       class="edit-board-form"
       [defaultText]="data.board.title"
       [title]="data.board.title"
-      (handleSubmit)="updateBoardName($event)"
-    ></inline-form>
+      (handleSubmit)="updateBoardName($event)"></inline-form>
     <div class="delete-board" (click)="deleteBoard()">Delete board</div>
   </div>
   <div class="columns">
@@ -17,27 +16,23 @@
           class="edit-column-form"
           [defaultText]="column.title"
           [title]="column.title"
-          (handleSubmit)="updateColumnName($event, column.id)"
-        ></inline-form>
+          (handleSubmit)="updateColumnName(column.id, $event)"></inline-form>
         <img
-          src="/assets/close_icon.svg"
+          src="assets/close_icon.svg"
           class="column-delete-icon"
-          (click)="deleteColumn(column.id)"
-        />
+          (click)="deleteColumn(column.id)">
       </div>
       <div
-        *ngFor="let task of getTasksByColumn(column.id, data.tasks)"
         class="task"
-      >
-        {{ task.title }}
-      </div>
+           *ngFor="let task of getTasksByColumn(column.id, data.tasks)"
+      (click)="openTask(column.id, task.id)">{{task.title}}</div>
       <inline-form
         class="create-task-form"
         defaultText="Add a card"
         [hasButton]="true"
         buttonText="Add card"
         inputPlaceholder="Enter a title for this card"
-        (handleSubmit)="createTask($event, column.id)"
+        (handleSubmit)="createTask(column.id, $event)"
       ></inline-form>
     </div>
     <inline-form
@@ -50,3 +45,5 @@
     ></inline-form>
   </div>
 </div>
+
+<router-outlet></router-outlet>

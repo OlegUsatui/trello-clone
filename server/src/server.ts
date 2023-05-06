@@ -1,18 +1,18 @@
 import express from "express";
 import { createServer } from "http";
+import bodyParser from "body-parser";
+import cors from "cors";
 import { Server } from "socket.io";
-import { Socket } from "./types/socket.interface";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { secret } from "./config";
 import * as usersController from "./controllers/users";
 import * as boardsController from "./controllers/boards";
 import * as columnsController from "./controllers/columns";
 import * as tasksController from "./controllers/tasks";
-import bodyParser from "body-parser";
-import authMiddleware from "./middlewares/auth";
-import cors from "cors";
 import { SocketEventsEnum } from "./types/socketEvents.enum";
-import { secret } from "./config";
+import { Socket } from "./types/socket.interface";
+import authMiddleware from "./middlewares/auth";
 import User from "./models/user";
 
 const app = express();
@@ -48,7 +48,11 @@ app.get(
   authMiddleware,
   columnsController.getColumns
 );
-app.get("/api/boards/:boardId/tasks", authMiddleware, tasksController.getTasks);
+app.get(
+    "/api/boards/:boardId/tasks",
+    authMiddleware,
+    tasksController.getTasks
+);
 app.post("/api/boards", authMiddleware, boardsController.createBoard);
 
 io.use(async (socket: Socket, next) => {
@@ -75,23 +79,29 @@ io.use(async (socket: Socket, next) => {
   socket.on(SocketEventsEnum.boardsLeave, (data) => {
     boardsController.leaveBoard(io, socket, data);
   });
-  socket.on(SocketEventsEnum.columnsCreate, (data) => {
-    columnsController.createColumn(io, socket, data);
-  });
-  socket.on(SocketEventsEnum.tasksCreate, (data) => {
-    tasksController.createTask(io, socket, data);
-  });
+  socket.on(SocketEventsEnum.columnCreate, data => {
+    columnsController.createColumn(io, socket, data)
+  })
+  socket.on(SocketEventsEnum.taskCreate, data => {
+    tasksController.createTask(io, socket, data)
+  })
   socket.on(SocketEventsEnum.boardsUpdate, (data) => {
     boardsController.updateBoard(io, socket, data);
   });
   socket.on(SocketEventsEnum.boardsDelete, (data) => {
     boardsController.deleteBoard(io, socket, data);
   });
-  socket.on(SocketEventsEnum.columnsDelete, (data) => {
+  socket.on(SocketEventsEnum.columnDelete, (data) => {
     columnsController.deleteColumn(io, socket, data);
   });
-  socket.on(SocketEventsEnum.columnsUpdate, (data) => {
+  socket.on(SocketEventsEnum.columnUpdate, (data) => {
     columnsController.updateColumn(io, socket, data);
+  });
+  socket.on(SocketEventsEnum.taskUpdate, (data) => {
+    tasksController.updateTask(io, socket, data);
+  });
+  socket.on(SocketEventsEnum.taskDelete, (data) => {
+    tasksController.deleteTask(io, socket, data);
   });
 });
 

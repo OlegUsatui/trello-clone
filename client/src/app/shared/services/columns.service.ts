@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ColumnInterface } from '../types/column.interface';
-import { ColumnInputInterface } from '../types/columnInput.interface';
-import { SocketEventsEnum } from '../types/socketEvents.enum';
+import { ColumnRequestInterface } from '../types/columnRequest.interface';
 import { SocketService } from './socket.service';
+import { SocketEventsEnum } from '../types/socketEvents.enum';
 
 @Injectable()
 export class ColumnsService {
@@ -16,26 +16,15 @@ export class ColumnsService {
     return this.http.get<ColumnInterface[]>(url);
   }
 
-  createColumn(columnInput: ColumnInputInterface): void {
-    this.socketService.emit(SocketEventsEnum.columnsCreate, columnInput);
+  createColumn(columnRequest: ColumnRequestInterface): void {
+    this.socketService.emit(SocketEventsEnum.columnCreate, columnRequest);
   }
 
-  updateColumn(
-    boardId: string,
-    columnId: string,
-    fields: { title: string }
-  ): void {
-    this.socketService.emit(SocketEventsEnum.columnsUpdate, {
-      boardId,
-      columnId,
-      fields,
-    });
+  updateColumn(boardId: string, columnId: string, fields: {title: string}): void {
+    this.socketService.emit(SocketEventsEnum.columnUpdate, { boardId, columnId, fields })
   }
 
   deleteColumn(boardId: string, columnId: string): void {
-    this.socketService.emit(SocketEventsEnum.columnsDelete, {
-      boardId,
-      columnId,
-    });
+    this.socketService.emit(SocketEventsEnum.columnDelete, { boardId, columnId });
   }
 }

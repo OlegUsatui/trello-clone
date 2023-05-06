@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { BoardInterface } from '../types/board.interface';
-import { SocketEventsEnum } from '../types/socketEvents.enum';
 import { SocketService } from './socket.service';
+import { SocketEventsEnum } from '../types/socketEvents.enum';
 
 @Injectable()
 export class BoardsService {
@@ -25,11 +25,11 @@ export class BoardsService {
     return this.http.post<BoardInterface>(url, { title });
   }
 
-  updateBoard(boardId: string, fields: { title: string }): void {
-    this.socketService.emit(SocketEventsEnum.boardsUpdate, { boardId, fields });
+  updateBoard(boardId: string, fields: {title: string}): void {
+    this.socketService.emit(SocketEventsEnum.boardsUpdate, { boardId, fields })
   }
 
   deleteBoard(boardId: string): void {
-    this.socketService.emit(SocketEventsEnum.boardsDelete, { boardId });
+    this.socketService.emit(SocketEventsEnum.boardsDelete, { boardId })
   }
 }

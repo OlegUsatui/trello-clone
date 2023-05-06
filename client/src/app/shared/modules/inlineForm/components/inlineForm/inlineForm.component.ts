@@ -23,7 +23,7 @@ export class InlineFormComponent {
   constructor(private fb: FormBuilder) {}
 
   activeEditing(): void {
-    if (this.title) {
+    if (this.title && !this.isEditing) {
       this.form.patchValue({ title: this.title });
     }
     this.isEditing = true;
